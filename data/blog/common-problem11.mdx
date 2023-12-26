@@ -1,0 +1,75 @@
+---
+title: '解决Ubuntu 22.04 Nginx版本旧的问题11'
+date: '2023-11-22'
+lastmod: '2023-11-22'
+tags: ['nginx', 'ubuntu']
+draft: false
+summary: 解决Ubuntu 22.04 Nginx版本旧的问题11
+---
+# 解决Ubuntu 22.04 Nginx版本旧的问题
+
+
+```bash
+# 查询apt软件库版本
+apt list -a nginx
+# 更新软件库版本
+apt update
+```
+如果发现nginx软件库较旧，想使用新版本nginx的话，需要给apt提供新的nginx源
+
+配置源文件
+```bash
+vim /etc/apt/sources.list
+```
+在最下方加入
+```bash
+deb https://nginx.org/packages/ubuntu/ bionic nginx
+deb-src https://nginx.org/packages/ubuntu/ bionic nginx
+```
+然后更新和安装
+```bash
+# 再次更新apt软件库
+apt update
+# 安装nginx -y为自动同意安装过程中请求
+apt install nginx -y
+```
+接下来可能会出现报错，如没有报错可跳过这一步
+```
+W: GPG error: https://nginx.org/packages/ubuntu bionic InRelease: The following signatures couldn't be verified because the public key is not available: NO_PUBKEY ABF5BD827BD9BF62
+```
+把你上面看到的NO_PUBKEY 复制出来，拼成如下命令并执行，执行后再次安装nginx
+```bash
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62
+# 查询apt软件库版本
+apt list -a nginx
+# 再次安装nginx
+apt install nginx -y
+```
+
+此时又可能会报错，提示缺少libssl1.1这个依赖，如果没有报错可无视
+```
+The following packages have unmet dependencies:
+ nginx : Depends: libssl1.1 (>= 1.1.1) but it is not installable
+E: Unable to correct problems, you have held broken packages.
+```
+此时需要输入执行以下命令
+```bash
+# 添加源
+echo "deb http://security.ubuntu.com/ubuntu focal-security main" | sudo tee /etc/apt/sources.list.d/focal-security.list
+# 更新软件库
+apt update
+# 安装缺少的libssl1.1依赖
+apt install libssl1.1
+# 再次安装nginx
+apt install nginx -y
+```
+此时应该可以成功安装最新版的nginx
+```bash
+nginx -v
+```
+
+
+
+
+
+
