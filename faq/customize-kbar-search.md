@@ -8,7 +8,7 @@ Add a `SearchProvider` component such as the one shown below and use it in place
 
 ```tsx
 'use client'
-
+--
 import { KBarSearchProvider } from 'pliny/search/KBar'
 import { useRouter } from 'next/navigation'
 import { CoreContent } from 'pliny/utils/contentlayer'
